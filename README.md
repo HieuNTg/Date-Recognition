@@ -34,11 +34,11 @@ An end-to-end deep learning pipeline that detects and reads expiry dates from pr
                            ▼
             ┌──────────── CRNN ────────────┐
             │                              │
-            │  ┌───────┐   ┌──────────┐   ┌──────────┐
-            │  │  CNN   │──▶│   RNN    │──▶│ CTC Loss │
-            │  │Feature │   │(BiLSTM)  │   │          │
-            │  │Extract.│   │          │   │          │
-            │  └───────┘   └──────────┘   └──────────┘
+            │  ┌────────┐    ┌───────────┐    ┌──────────┐
+            │  │  CNN   │──▶ │   RNN    │ ──▶│ CTC Loss │
+            │  │Feature │    │ (BiLSTM)  │    │          │
+            │  │Extract.│    │           │    │          │
+            │  └────────┘    └───────────┘    └──────────┘
             │                              │
             └──────────────┬───────────────┘
                            ▼
