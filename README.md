@@ -6,6 +6,16 @@ An end-to-end deep learning pipeline that detects and reads expiry dates from pr
   <img width="1024" alt="Demo" src="https://github.com/HieuNTg/Date-Recognition/assets/96096473/23da4d31-45d7-4824-96bd-3b2aa25b090f">
 </p>
 
+## About
+
+Trong ngành thực phẩm và bán lẻ, việc kiểm tra hạn sử dụng sản phẩm vẫn chủ yếu được thực hiện thủ công — tốn thời gian, dễ sai sót, và khó mở rộng quy mô. **DateReg** giải quyết vấn đề này bằng cách tự động hóa toàn bộ quy trình thông qua Computer Vision:
+
+1. **Phát hiện** — Mô hình YOLOv8 được huấn luyện trên 11,860 ảnh sản phẩm để định vị chính xác vùng chứa ngày tháng trên bao bì
+2. **Nhận diện** — Mô hình CRNN (CNN + BiLSTM + CTC) được huấn luyện trên 128,510 ảnh text để đọc ký tự từ vùng date đã crop
+3. **Phân tích** — Hệ thống tự động parse nhiều định dạng ngày, xử lý lỗi OCR phổ biến, và đánh giá trạng thái hết hạn
+
+Dự án hướng đến ứng dụng trong quản lý kho hàng, kiểm tra chất lượng tại siêu thị, và hệ thống giám sát sản phẩm tự động.
+
 ## Features
 
 - **Object Detection** — YOLOv8 locates date regions on product packaging
