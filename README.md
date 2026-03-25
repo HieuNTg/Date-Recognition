@@ -18,12 +18,34 @@ An end-to-end deep learning pipeline that detects and reads expiry dates from pr
 ## Architecture
 
 ```
-Input Image → YOLOv8 (Detection) → Crop Regions → CTC-OCR (Recognition) → Date Parsing → Expiry Status
+                    ┌─────────────┐
+                    │ Input Image │
+                    └──────┬──────┘
+                           ▼
+                    ┌─────────────┐
+                    │   Pre-      │
+                    │ Processing  │
+                    └──────┬──────┘
+                           ▼
+                    ┌─────────────┐
+                    │   Detect    │
+                    │   YOLOv8    │
+                    └──────┬──────┘
+                           ▼
+            ┌──────────── CRNN ────────────┐
+            │                              │
+            │  ┌───────┐   ┌──────────┐   ┌──────────┐
+            │  │  CNN   │──▶│   RNN    │──▶│ CTC Loss │
+            │  │Feature │   │(BiLSTM)  │   │          │
+            │  │Extract.│   │          │   │          │
+            │  └───────┘   └──────────┘   └──────────┘
+            │                              │
+            └──────────────┬───────────────┘
+                           ▼
+                    ┌─────────────┐
+                    │    Text     │
+                    └─────────────┘
 ```
-
-<p align="center">
-  <img width="604" alt="Pipeline" src="https://github.com/HieuNTg/Date-Recognition/assets/96096473/b5c758ed-fcb5-4e10-a2c8-a71720b8865a">
-</p>
 
 ## Tech Stack
 
@@ -71,13 +93,17 @@ DateReg/
 
 **Detection (YOLOv8):**
 
-![Detection Result](https://github.com/HieuNTg/Date-Recognition/assets/96096473/e3e831fa-b112-439f-8f3f-7ad5f7aa7345)
+|  | Precision | Recall | mAP50 | mAP50-95 |
+|---|:-:|:-:|:-:|:-:|
+| **Training** | 0.969 | 0.963 | 0.981 | 0.862 |
+| **Test** | 0.960 | 0.963 | 0.976 | 0.874 |
 
 **Text Recognition (CTC-OCR):**
 
-<p align="center">
-  <img width="325" alt="OCR Result" src="https://github.com/HieuNTg/Date-Recognition/assets/96096473/0c8f2223-ef85-43cc-a957-2865861b330a">
-</p>
+| Metric | Score |
+|---|:-:|
+| **CER** (Character Error Rate) | 0.05 |
+| **WER** (Word Error Rate) | 0.19 |
 
 ## Quick Start
 
