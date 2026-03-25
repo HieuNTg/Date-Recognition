@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environment
+venv/
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Model weights (large files)
+models/yolo/*.pt
+models/yolo/*.pb
+models/ocr/*.h5
+!models/yolo/.gitkeep
+!models/ocr/.gitkeep
+
+# Temp detection crops
+temp/
+img_*.jpg
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Environment
+.env

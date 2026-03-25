@@ -1,0 +1,26 @@
+model:
+  yolo:
+    weights: models/yolo/best.pt
+    imgsz: 640
+    confidence: 0.25
+    padding: 5
+
+  ocr:
+    weights: models/ocr/best_model_new.h5
+    img_width: 224
+    img_height: 64
+    max_length: 11
+
+date_parser:
+  prefixes:
+    - EXP
+    - BB
+    - MFG
+    - NSX
+    - HSD
+  warning_days: 30
+
+app:
+  title: DateReg
+  subtitle: "Hệ thống nhận diện hạn sử dụng sản phẩm"
+  temp_dir: temp
