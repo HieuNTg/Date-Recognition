@@ -68,8 +68,14 @@ class OCRRecognizer:
         ]
         return [text.replace("[UNK]", " ").strip() for text in texts]
 
-    def recognize(self, img_path):
-        image = Image.open(img_path)
+    def recognize(self, image):
+        """Read date text from a cropped region.
+
+        Args:
+            image: a PIL.Image, or a path to an image file.
+        """
+        if not isinstance(image, Image.Image):
+            image = Image.open(image)
         image_arr = np.array(image)
         rgb = tf.image.convert_image_dtype(image_arr, tf.float32)[..., :3]
         gray = tf.image.rgb_to_grayscale(rgb)

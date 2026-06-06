@@ -1,14 +1,12 @@
 import streamlit as st
 from PIL import Image, ImageDraw, ImageFont
 
-from src.detection import YOLODetector
-from src.recognition import OCRRecognizer
-from src.utils import DateParser
+from src.pipeline import DatePipeline
 
 
 @st.cache_resource
-def load_models():
-    return YOLODetector(), OCRRecognizer(), DateParser()
+def load_pipeline():
+    return DatePipeline()
 
 
 CUSTOM_CSS = """
@@ -166,8 +164,8 @@ def draw_boxes(image, detections):
         font = ImageFont.load_default()
 
     for det in detections:
-        x, y, x1, y1 = det["bbox"]
-        conf = det["confidence"]
+        x, y, x1, y1 = det.bbox
+        conf = det.confidence
 
         draw.rectangle([x, y, x1, y1], fill=(108, 99, 255, 25))
         draw.rectangle([x, y, x1, y1], outline=(108, 99, 255, 240), width=max(2, 2 * scale))
@@ -206,7 +204,7 @@ def main():
     )
     st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
 
-    detector, recognizer, date_parser = load_models()
+    pipeline = load_pipeline()
 
     # ── State ──
     if "result" not in st.session_state:
@@ -268,38 +266,23 @@ def main():
         if btn:
             # ── Run pipeline ──
             pipeline_ph = st.empty()
-            progress = st.progress(0, text="Đang phát hiện vùng date...")
-
-            pipeline_ph.markdown(render_pipeline_html(1), unsafe_allow_html=True)
-            detections = detector.predict(image)
-            progress.progress(35, text=f"Tìm thấy {len(detections)} vùng. Đang OCR...")
+            progress = st.progress(0, text="Đang xử lý ảnh...")
 
             pipeline_ph.markdown(render_pipeline_html(2), unsafe_allow_html=True)
-            all_dates = []
-            for det in detections:
-                all_dates.append(recognizer.recognize(det["filepath"]))
-            progress.progress(70, text="Đang phân tích ngày...")
-
-            pipeline_ph.markdown(render_pipeline_html(3), unsafe_allow_html=True)
-            detector.cleanup()
-            result_date = date_parser.get_max_date(all_dates) if all_dates else None
+            result = pipeline.run(image)
             progress.progress(100, text="Hoàn tất!")
 
             pipeline_ph.markdown(render_pipeline_html(4), unsafe_allow_html=True)
 
-            st.session_state.result = {
-                "date": result_date,
-                "detections": detections,
-                "all_dates": all_dates,
-            }
+            st.session_state.result = result
 
-            annotated = draw_boxes(image, detections)
+            annotated = draw_boxes(image, result.detections)
             st.image(annotated, use_container_width=True)
         else:
             r = st.session_state.result
-            if r and r.get("detections"):
+            if r and r.detections:
                 st.markdown(render_pipeline_html(4), unsafe_allow_html=True)
-                annotated = draw_boxes(image, r["detections"])
+                annotated = draw_boxes(image, r.detections)
                 st.image(annotated, use_container_width=True)
             else:
                 st.markdown(render_pipeline_html(0), unsafe_allow_html=True)
@@ -307,12 +290,10 @@ def main():
 
     with col_result:
         r = st.session_state.result
-        if r and r.get("date"):
-            result_date = r["date"]
-            detections = r["detections"]
-            all_dates = r["all_dates"]
-
-            status, delta = date_parser.evaluate_expiry(result_date)
+        if r and r.date:
+            result_date = r.date
+            detections = r.detections
+            status, delta = r.status, r.days_remaining
             if status == "valid":
                 pill = f'<div class="status-pill s-valid">✓ Còn hạn — còn {delta} ngày</div>'
             elif status == "warning":
@@ -333,8 +314,8 @@ def main():
             if detections:
                 rows = ""
                 for i, det in enumerate(detections):
-                    c = det["confidence"]
-                    txt = all_dates[i] if i < len(all_dates) else "—"
+                    c = det.confidence
+                    txt = det.text or "—"
                     rows += f"""<tr>
                         <td style="color:#6B7280;">#{i+1}</td>
                         <td><code style="background:#6C63FF18;padding:2px 6px;border-radius:4px;color:#A5B4FC;">{txt}</code></td>
